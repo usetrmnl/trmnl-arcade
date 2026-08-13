@@ -1,0 +1,7 @@
+name = "trmnl-arcade"
+main = "src/index.js"
+compatibility_date = "2026-08-13"
+
+[[kv_namespaces]]
+binding = "ARCADE"
+id = "PLACEHOLDER_REPLACED_IN_TASK_7"
