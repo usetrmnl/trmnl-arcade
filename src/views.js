@@ -23,7 +23,7 @@ const PIECE_GLYPHS = {
 }
 
 const grid = (rows) =>
-  `<table>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escape(PIECE_GLYPHS[cell] || cell)}</td>`).join('')}</tr>`).join('')}</table>`
+  `<table>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escape(Object.hasOwn(PIECE_GLYPHS, cell) ? PIECE_GLYPHS[cell] : cell)}</td>`).join('')}</tr>`).join('')}</table>`
 
 export function seatPicker(record, origin) {
   const seats = Object.keys(record.seats)
