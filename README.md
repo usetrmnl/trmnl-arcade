@@ -50,8 +50,9 @@ Then:
 npm test
 ```
 
-Open a PR. See `CONTRIBUTING.md` for the rules a contributed game must follow
-and why they exist.
+Open a PR. **[docs/writing-a-game.md](docs/writing-a-game.md)** walks through both
+game shapes — shared information like chess, and hidden information like
+battleship — and `CONTRIBUTING.md` has the rules a contributed game must follow.
 
 ## Running it yourself
 

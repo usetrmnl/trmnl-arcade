@@ -1,3 +1,6 @@
+For a walkthrough of both game shapes with worked examples, see
+[docs/writing-a-game.md](docs/writing-a-game.md). This file is the rules.
+
 # Contributing
 
 Community game PRs are welcome. The reason we can accept a game module
