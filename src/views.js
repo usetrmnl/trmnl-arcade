@@ -15,8 +15,15 @@ const page = (title, body) => `<!doctype html>
   .error { color: #b00; }
 </style></head><body>${body}</body></html>`
 
+// Chess sends colour+type codes (e.g. "br"); the phone has full system fonts, so
+// show players a recognisable glyph instead of the raw code.
+const PIECE_GLYPHS = {
+  wp: '♙', wn: '♘', wb: '♗', wr: '♖', wq: '♕', wk: '♔',
+  bp: '♟', bn: '♞', bb: '♝', br: '♜', bq: '♛', bk: '♚'
+}
+
 const grid = (rows) =>
-  `<table>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escape(cell)}</td>`).join('')}</tr>`).join('')}</table>`
+  `<table>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escape(PIECE_GLYPHS[cell] || cell)}</td>`).join('')}</tr>`).join('')}</table>`
 
 export function seatPicker(record, origin) {
   const seats = Object.keys(record.seats)

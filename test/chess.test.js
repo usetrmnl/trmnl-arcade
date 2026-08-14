@@ -59,6 +59,10 @@ describe('publicView', () => {
   it('names the side to move', () => {
     expect(publicView(initialState()).turn_name).toBe('White')
   })
+
+  it('names each piece by colour and type', () => {
+    expect(publicView(initialState()).rows[0][0]).toBe('br')
+  })
 })
 
 describe('privateView', () => {

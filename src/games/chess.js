@@ -6,12 +6,6 @@ export const meta = {
   moveLabel: 'Your move in algebraic notation (e.g. e4, Nf3)'
 }
 
-// Outline pieces read as white and filled pieces as black on a 1-bit panel.
-const GLYPHS = {
-  wp: '♙', wn: '♘', wb: '♗', wr: '♖', wq: '♕', wk: '♔',
-  bp: '♟', bn: '♞', bb: '♝', br: '♜', bq: '♛', bk: '♚'
-}
-
 export function initialState() {
   return { fen: new Chess().fen(), lastMove: null, result: null }
 }
@@ -34,7 +28,7 @@ export function publicView(state) {
   const board = new Chess(state.fen)
 
   return {
-    rows: board.board().map((rank) => rank.map((square) => (square ? GLYPHS[`${square.color}${square.type}`] : ''))),
+    rows: board.board().map((rank) => rank.map((square) => (square ? `${square.color}${square.type}` : ''))),
     turn: board.turn() === 'w' ? 1 : 2,
     turn_name: board.turn() === 'w' ? 'White' : 'Black',
     last_move: state.lastMove,
