@@ -1,0 +1,69 @@
+<div class="view view--full">
+  {% if phase == 'lobby' %}
+    <div class="layout layout--col gap--large">
+      <span class="title">SCAN TO PLAY</span>
+      <span class="label label--gray-out">Chess</span>
+      <div class="grid grid--cols-2">
+        {%- comment -%} iterate the hash, not seats_open — its keys are strings, its entries ints {%- endcomment -%}
+        {% for entry in join_urls %}
+          <div class="item">
+            <div class="label">PLAYER {{ entry[0] }}</div>
+            {{ entry[1] | qr_code: 8 }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="layout layout--row gap--large" style="justify-content:flex-start;align-items:center">
+      {%- comment -%} pieces are SVG paths, not glyphs — see spike results {%- endcomment -%}
+      {%- comment -%} .layout--col is flex:0 1 auto and collapses to 0 beside a table; both need explicit bases {%- endcomment -%}
+      <table class="table" style="flex:0 0 420px;table-layout:fixed;border-collapse:collapse">
+        {% for row in board.rows %}
+          <tr>
+            {% for cell in row %}
+              {%- assign shaded = forloop.index0 | plus: forloop.parentloop.index0 | modulo: 2 -%}
+              <td style="height:44px;text-align:center{% if shaded == 1 %};background:#d0d0d0{% endif %}">
+                {%- assign piece_color = cell | slice: 0 -%}
+                {%- assign piece_type = cell | slice: 1 -%}
+                {%- assign piece_path = '' -%}
+                {%- case piece_type -%}
+                  {%- when 'p' -%}
+                    {%- assign piece_path = 'M16,6 L19,10 L17,13 L20,17 L18,21 L23,24 L24,27 L8,27 L9,24 L14,21 L12,17 L15,13 L13,10 Z' -%}
+                  {%- when 'r' -%}
+                    {%- assign piece_path = 'M9,6 L12,6 L12,9 L14,9 L14,6 L18,6 L18,9 L20,9 L20,6 L23,6 L23,21 L25,24 L25,27 L7,27 L7,24 L9,21 Z' -%}
+                  {%- when 'b' -%}
+                    {%- comment -%} the notch in the mitre is what tells a bishop from a pawn at 44px {%- endcomment -%}
+                    {%- assign piece_path = 'M16,4 L18,8 L16,6.5 L18.5,14 L17,18 L23,24 L24,27 L8,27 L9,24 L15,18 L13.5,14 L14,8 Z M13.5,18.5 L18.5,18.5' -%}
+                  {%- when 'q' -%}
+                    {%- assign piece_path = 'M9,10 L9,6 L11,10 L13,6 L15,10 L16,5 L17,10 L19,6 L21,10 L23,6 L23,10 L23,20 L25,24 L25,27 L7,27 L7,24 L9,20 Z' -%}
+                  {%- when 'k' -%}
+                    {%- assign piece_path = 'M14.5,3 L17.5,3 L17.5,6 L21,6 L21,9 L17.5,9 L17.5,12 L14.5,12 L14.5,9 L11,9 L11,6 L14.5,6 Z M16,13 L20,16 L18,20 L23,24 L24,27 L8,27 L9,24 L15,20 L13,16 Z' -%}
+                  {%- when 'n' -%}
+                    {%- assign piece_path = 'M10,26 L9,17 L10,12 L12,7 L14.5,5 L16,9 L20,9.5 L24,12 L26,14.5 L24,16 L22,15.5 L21,17.5 L19,20 L21,23 L23,27 L8,27 Z' -%}
+                {%- endcase -%}
+                {%- if piece_path != '' -%}
+                  {%- if piece_color == 'w' -%}
+                    <svg viewBox="0 0 32 32" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="{{ piece_path }}" /></svg>
+                  {%- else -%}
+                    <svg viewBox="0 0 32 32" width="36" height="36" fill="currentColor"><path d="{{ piece_path }}" /></svg>
+                  {%- endif -%}
+                {%- endif -%}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </table>
+      <div class="layout layout--col gap--medium" style="flex:1 1 auto;min-width:0">
+        {% if phase == 'over' %}
+          <span class="title">{{ result }}</span>
+          <div class="label">PLAY AGAIN</div>
+          {{ play_again_url | qr_code: 6 }}
+        {% else %}
+          <span class="title">{{ board.turn_name }} to move</span>
+          {% if board.last_move %}<span class="label">Last: {{ board.last_move }}</span>{% endif %}
+          {% if board.check %}<span class="label">Check</span>{% endif %}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>

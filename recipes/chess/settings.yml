@@ -1,0 +1,16 @@
+---
+name: Arcade Chess
+description: Play correspondence chess on a shared TRMNL. Scan a code to take a seat; moves are made from your phone and the screen catches up on its next refresh.
+strategy: polling
+polling_verb: GET
+polling_url: https://{{ arcade_host }}/s/chess/{{ trmnl.device.friendly_id }}.json
+refresh_interval: 15
+no_screen_padding: 'no'
+dark_mode: 'no'
+custom_fields:
+- keyname: arcade_host
+  field_type: string
+  name: Arcade Host
+  default: arcade.trmnl.com
+  help_text: Leave as-is to use the TRMNL-hosted arcade. Point it at your own Worker
+    to run your own games.
