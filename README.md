@@ -61,9 +61,10 @@ npm test
 npx wrangler dev
 ```
 
-To point a TRMNL recipe at your own Worker instead of the hosted instance,
-override the recipe's `arcade_host` custom field with your `wrangler dev` URL
-(or your own deployed Worker's URL).
+`wrangler dev` is for local testing only — a TRMNL device fetches its screen
+through TRMNL's servers, which cannot reach your localhost. To try a game on
+real hardware, deploy your own Worker (`npx wrangler deploy`) and override the
+recipe's `arcade_host` custom field with that Worker's hostname.
 
 ## Known limitations
 
