@@ -2,6 +2,12 @@ name = "trmnl-arcade"
 main = "src/index.js"
 compatibility_date = "2026-08-13"
 
+# Cloudflare creates and owns the DNS record for a custom domain — never point a
+# record at workers.dev by hand, it will not route.
+[[routes]]
+pattern = "arcade.trmnl.com"
+custom_domain = true
+
 [[kv_namespaces]]
 binding = "ARCADE"
-id = "PLACEHOLDER_REPLACED_IN_TASK_7"
+id = "c67e24e42e9a425abbd0a7d4cf35bc40"
