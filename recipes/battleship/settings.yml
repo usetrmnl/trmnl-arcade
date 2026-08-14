@@ -1,9 +1,9 @@
 ---
-name: Arcade Chess
-description: Correspondence chess on your TRMNL
+name: Arcade Battleship
+description: Battleship with hidden fleets
 strategy: polling
 polling_verb: GET
-polling_url: https://{{ arcade_host }}/s/chess/{{ trmnl.device.friendly_id }}.json
+polling_url: https://{{ arcade_host }}/s/battleship/{{ trmnl.device.friendly_id }}.json
 refresh_interval: 15
 no_screen_padding: 'no'
 dark_mode: 'no'

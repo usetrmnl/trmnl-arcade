@@ -15,6 +15,10 @@ The zip is just `settings.yml` + `full.liquid`. Rebuild it after editing either:
 cd recipes/chess && zip -q -j arcade-chess.zip settings.yml full.liquid
 ```
 
+`description` is capped at **35 characters** (`Plugin::MAX_DESCRIPTION_LENGTH`) — it
+is a tagline, not a description. A longer one fails the import with no useful
+message.
+
 ## Why the markup looks the way it does
 
 - **Pieces are inline SVG, never Unicode.** None of the three fonts a TRMNL
@@ -26,3 +30,9 @@ cd recipes/chess && zip -q -j arcade-chess.zip settings.yml full.liquid
 - **The board is `flex: 0 0 420px` and the info column `flex: 1 1 auto`.**
   The framework's `.layout--col` is `flex: 0 1 auto` and collapses to zero
   width beside a table, taking the turn indicator off-screen with it.
+- **Never nest `.layout` inside `.layout`.** A nested one is `flex: 0 1 auto`
+  and collapses to zero width; forcing `height: auto` then collapses it to zero
+  height instead. The battleship grids use a plain `display:flex` div.
+- **Battleship draws its own cell borders and A-H/1-8 labels.** Shots are called
+  by coordinate, so unlabelled cells make the board unusable rather than merely
+  plain.

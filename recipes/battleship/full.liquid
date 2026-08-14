@@ -1,0 +1,55 @@
+<div class="view view--full">
+  {% if phase == 'lobby' %}
+    <div class="layout layout--col gap--large">
+      <span class="title">SCAN TO PLAY</span>
+      <span class="label label--gray-out">Battleship</span>
+      <div class="grid grid--cols-2">
+        {%- comment -%} iterate the hash, not seats_open — its keys are strings, its entries ints {%- endcomment -%}
+        {% for entry in join_urls %}
+          <div class="item">
+            <div class="label">PLAYER {{ entry[0] }}</div>
+            {{ entry[1] | qr_code: 8 }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    {%- assign files = 'A,B,C,D,E,F,G,H' | split: ',' -%}
+    <div class="layout layout--col gap--small" style="align-items:center">
+      {% if phase == 'over' %}
+        <span class="title">{{ result }}</span>
+      {% else %}
+        <span class="title">{{ board.turn_name }} to fire</span>
+      {% endif %}
+      {% if board.last_move %}<span class="label">Last: {{ board.last_move }}</span>{% endif %}
+      {%- comment -%} plain flex, not .layout: a nested .layout collapses to zero width, then to zero height when told otherwise {%- endcomment -%}
+      <div style="display:flex;flex-direction:row;gap:40px;justify-content:center;align-items:flex-start">
+        {%- comment -%} iterate the hash so seat numbering comes from the data, not hardcoded keys {%- endcomment -%}
+        {% for waters in board.grids %}
+          <div style="flex:0 0 auto;text-align:center">
+            <div class="label">PLAYER {{ waters[0] }} WATERS</div>
+            {%- comment -%} shots are called by coordinate, so the file/rank labels are load-bearing {%- endcomment -%}
+            <table style="border-collapse:collapse;margin:0 auto">
+              <tr>
+                <td style="width:16px"></td>
+                {% for file in files %}<td style="width:30px;font-size:10px">{{ file }}</td>{% endfor %}
+              </tr>
+              {% for row in waters[1] %}
+                <tr>
+                  <td style="font-size:10px;text-align:right;padding-right:2px">{{ forloop.index }}</td>
+                  {% for cell in row %}
+                    <td style="width:30px;height:30px;border:1px solid #999;font-size:18px;line-height:1">{{ cell }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% endfor %}
+      </div>
+      {% if phase == 'over' %}
+        <div class="label">PLAY AGAIN</div>
+        {{ play_again_url | qr_code: 6 }}
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
