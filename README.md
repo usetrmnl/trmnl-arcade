@@ -24,6 +24,8 @@ fleet the other can't see).
 4. Once every seat is claimed, the game starts. Moves are made from your
    phone; the shared screen catches up on its next refresh.
 
+Player-facing walkthrough: **[docs/playing.md](docs/playing.md)**.
+
 ## How to add a game
 
 A game is one file in `src/games/` exporting five things:
