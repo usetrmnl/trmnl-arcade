@@ -75,21 +75,16 @@ function placeFleet(random) {
   const cells = []
 
   for (const length of SHIP_LENGTHS) {
-    cells.push(...place(length, cells, random))
+    let placed = null
+    for (let attempt = 0; !placed && attempt < MAX_PLACEMENT_ATTEMPTS; attempt++) {
+      placed = tryPlace(length, cells, random)
+    }
+    // Throws rather than looping forever: a degenerate `random` never places a second ship.
+    if (!placed) throw new Error('Could not place the fleet')
+    cells.push(...placed)
   }
 
   return cells
-}
-
-function place(length, taken, random) {
-  for (let attempt = 0; attempt < MAX_PLACEMENT_ATTEMPTS; attempt++) {
-    const placed = tryPlace(length, taken, random)
-    if (placed) return placed
-  }
-
-  // A degenerate RNG (e.g. a constant test fixture) can never land an open slot by
-  // chance — fall back to a deterministic scan so placement always terminates.
-  return firstOpenSlot(length, taken)
 }
 
 function tryPlace(length, taken, random) {
@@ -104,17 +99,6 @@ function tryPlace(length, taken, random) {
 
   const overlaps = cells.some((cell) => taken.some((used) => used.x === cell.x && used.y === cell.y))
   return overlaps ? null : cells
-}
-
-function firstOpenSlot(length, taken) {
-  for (let y = 0; y < BOARD_SIZE; y++) {
-    for (let x = 0; x <= BOARD_SIZE - length; x++) {
-      const cells = Array.from({ length }, (_, offset) => ({ x: x + offset, y }))
-      if (!cells.some((cell) => taken.some((used) => used.x === cell.x && used.y === cell.y))) return cells
-    }
-  }
-
-  throw new Error('No room left to place a ship')
 }
 
 function parseSquare(move) {

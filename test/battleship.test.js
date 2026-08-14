@@ -1,11 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import { meta, initialState, applyMove, publicView, privateView } from '../src/games/battleship.js'
 
-// A fixed sequence makes fleet placement deterministic without stubbing internals.
-const fixedRandom = () => 0
+// Deterministic but varying — a constant collapses every ship onto the same cell.
+const deterministicRandom = () => {
+  let step = 0
+  return () => (step = (step + 0.37) % 1)
+}
 
 const stateWithKnownFleets = () => {
-  const state = initialState(fixedRandom)
+  const state = initialState(deterministicRandom())
   state.fleets = { 1: [{ x: 0, y: 0 }], 2: [{ x: 1, y: 1 }] }
   return state
 }
@@ -18,11 +21,11 @@ describe('meta', () => {
 
 describe('initialState', () => {
   it('gives each seat a fleet', () => {
-    expect(initialState(fixedRandom).fleets[1].length).toBeGreaterThan(0)
+    expect(initialState(deterministicRandom()).fleets[1].length).toBeGreaterThan(0)
   })
 
   it('starts with seat 1 to move', () => {
-    expect(initialState(fixedRandom).turn).toBe(1)
+    expect(initialState(deterministicRandom()).turn).toBe(1)
   })
 })
 
