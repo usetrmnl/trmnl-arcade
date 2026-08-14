@@ -1,32 +1,28 @@
 # TRMNL Arcade
 
-Your phone is the live playing surface. The TRMNL screen is an ambient public
-board that lags **up to 15–20 minutes** behind — that's a property of e-ink
-refresh budgets, not a defect. Don't expect the screen to update after every
-move; expect it to eventually catch up.
+<img width="1858" height="1072" alt="trmnl-arcade-chess" src="https://github.com/user-attachments/assets/978282e3-cbf9-4eae-9739-259011e44648" />
 
-TRMNL Arcade hosts turn-based games whose boards render on TRMNL e-ink
-displays. A device polls its game state, a shared screen shows who's playing
-and whose turn it is, and each player moves from their phone. Live at
-[arcade.trmnl.com](https://arcade.trmnl.com).
+Welcome to our experiment with calm, async, turn-based games.
 
-Two reference games ship today: chess (public information — both players see
-the whole board) and battleship (hidden information — each player has a
-fleet the other can't see).
+TRMNL Arcade is hosted on a Cloudflare worker and you're welcome to add one to our server.
+Gameplay lives at a tokenized URL, devices poll their own game's state, 
+and your device shows who's playing and whose turn it is.
 
-## How to play
+This project launched with two reference games: chess and battleship. 
 
-1. Install the TRMNL Arcade recipe on a device.
-2. Wait for the next refresh. The screen shows a QR code per open seat.
-3. Scan a code to claim that seat. Scanning returns a bookmarkable URL — bookmark
-   it, because that URL is your credential for the rest of the game. There's no
-   game code to type in; the game is keyed to the device you scanned.
-4. Once every seat is claimed, the game starts. Moves are made from your
-   phone; the shared screen catches up on its next refresh.
+Chess highlights a "public information" style, where both players see
+the whole board. Battleship showcases a "hidden information" style game, 
+where each player has content (in this case, a fleet) that the other player can't see.
+
+## How to play games
+
+1. Install a TRMNL Arcade recipe like [Chess](https://trmnl.com/recipes/415050) or [Battlefield](https://trmnl.com/recipes/415057).
+2. Scan the QR code(s) to start the game. Don't close the tab. ;)
+3. Have fun and stay safe.
 
 Player-facing walkthrough: **[docs/playing.md](docs/playing.md)**.
 
-## How to add a game
+## How to build games
 
 A game is one file in `src/games/` exporting five things:
 
@@ -34,8 +30,8 @@ A game is one file in `src/games/` exporting five things:
 export const meta = { name, seats, moveLabel }
 export function initialState()                  // fresh game state
 export function applyMove(state, seat, move)    // returns a NEW state; throws Error on an illegal move
-export function publicView(state)               // what the shared e-ink screen sees — never hidden info
-export function privateView(state, seat)        // what one player's phone sees
+export function publicView(state)               // what's on the TRMNL display — never hidden info
+export function privateView(state, seat)        // what a player sees from their phone/computer
 ```
 
 Plus one line registering it in `src/games/index.js`.
@@ -71,7 +67,7 @@ recipe's `arcade_host` custom field with that Worker's hostname.
 
 ## Known limitations
 
-- **A lost bookmark ends that game.** The player URL is the credential and
+- **A lost bookmark ends that game.** Player URLs act as credentials and
   there is no recovery — any recovery route reachable from the shared screen
   would be reachable by everyone who can see that screen.
 - **Anyone who can see the screen can act on it.** They can claim an open
@@ -80,12 +76,11 @@ recipe's `arcade_host` custom field with that Worker's hostname.
   waiting player's bookmark. Only a game already in progress is protected
   from a reset.
 - **A game abandoned mid-play is stuck** until its record expires after one
-  week.
+  week. Delete and re-install the plugin if you lose a URL.
 - **Simultaneous first polls of one device can race** and mint competing
   nonces, because Workers KV has no compare-and-set. The screen self-corrects
   on its next poll.
 
 ## Requirements
 
-Node 20+. Node 19 added the global `crypto.getRandomValues` this project
-relies on for seat tokens and nonces.
+Node 20+.
