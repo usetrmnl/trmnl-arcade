@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "engines": { "node": ">=20" },
   "scripts": {
     "test": "vitest run",
     "dev": "wrangler dev",

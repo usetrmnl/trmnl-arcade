@@ -89,7 +89,7 @@ function placeFleet(random) {
 
 function tryPlace(length, taken, random) {
   const horizontal = random() < 0.5
-  const span = BOARD_SIZE - length
+  const span = BOARD_SIZE - length + 1
   const x = Math.floor(random() * (horizontal ? span : BOARD_SIZE))
   const y = Math.floor(random() * (horizontal ? BOARD_SIZE : span))
   const cells = Array.from({ length }, (_, offset) => ({

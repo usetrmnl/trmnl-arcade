@@ -61,9 +61,8 @@ async function seatPickerResponse(request, env, nonce) {
 
 async function claimResponse(request, env, nonce, seat) {
   const record = await loadByNonce(env.ARCADE, nonce)
-  if (!record || !(seat in record.seats)) return new Response('No such seat', { status: 404 })
-  // Accepted: KV has no compare-and-set, so two simultaneous scans of one seat code can
-  // both see it open and the later write wins. Fixing it properly needs Durable Objects.
+  if (!record || !Object.hasOwn(record.seats, seat)) return new Response('No such seat', { status: 404 })
+  // Accepted race: KV lacks compare-and-set, so a simultaneous claim can win the same seat.
   if (record.seats[seat]) return new Response('Seat already taken', { status: 409 })
 
   const token = randomId(8)
@@ -99,8 +98,7 @@ async function playResponse(request, env, nonce, seat, token) {
 async function resetResponse(request, env, nonce) {
   const record = await loadByNonce(env.ARCADE, nonce)
   if (!record) return new Response('No such game', { status: 404 })
-  // The screen only shows this code once the game is over; a bystander scanning mid-game
-  // would otherwise wipe a live board and invalidate both players' bookmarks silently.
+  // Blocks a bystander from wiping a live board mid-game.
   if (record.phase === 'playing') return new Response('Game still in progress', { status: 409 })
 
   Object.keys(record.seats).forEach((seat) => { record.seats[seat] = null })

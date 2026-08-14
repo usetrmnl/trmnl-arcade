@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { meta, initialState, applyMove, publicView, privateView } from '../src/games/battleship.js'
 
+const BOARD_CELLS = 64
+
 // Deterministic but varying — a constant collapses every ship onto the same cell.
 const deterministicRandom = () => {
   let step = 0
@@ -26,6 +28,15 @@ describe('initialState', () => {
 
   it('starts with seat 1 to move', () => {
     expect(initialState(deterministicRandom()).turn).toBe(1)
+  })
+
+  it('can place a ship on every square of the board', () => {
+    const seen = new Set()
+    for (let run = 0; run < 2000; run++) {
+      initialState().fleets[1].forEach(({ x, y }) => seen.add(`${x},${y}`))
+    }
+
+    expect(seen.size).toBe(BOARD_CELLS)
   })
 })
 

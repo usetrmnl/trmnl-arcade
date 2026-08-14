@@ -30,8 +30,9 @@ export async function save(kv, record) {
   record.updatedAt = Date.now()
   const options = { expirationTtl: RECORD_TTL_SECONDS }
 
-  await kv.put(recordKey(record.game, record.key), JSON.stringify(record), options)
+  // Pointer first: a half-failed write then re-creates the game instead of stranding it.
   await kv.put(nonceKey(record.nonce), `${record.game}/${record.key}`, options)
+  await kv.put(recordKey(record.game, record.key), JSON.stringify(record), options)
   return record
 }
 
