@@ -25,16 +25,12 @@ feel wrong.
 
 ## Getting a game on your screen
 
-1. Find the game in **Recipes** — search for *Arcade Chess* or *Arcade
-   Battleship*.
-2. Install it.
-3. Add it to a playlist and wait for the next refresh.
+1. Install a recipe — [Arcade Chess](https://trmnl.com/recipes/415050) or
+   [Arcade Battleship](https://trmnl.com/recipes/415057).
+2. Add it to a playlist and wait for the next refresh.
 
 That's the whole setup. There's no game code to enter and nothing to configure —
 the game belongs to the device it's installed on.
-
-*(During the beta the recipes are unlisted, so use the direct link you were sent
-rather than searching.)*
 
 ## Taking a seat
 
