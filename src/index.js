@@ -62,6 +62,8 @@ async function seatPickerResponse(request, env, nonce) {
 async function claimResponse(request, env, nonce, seat) {
   const record = await loadByNonce(env.ARCADE, nonce)
   if (!record || !(seat in record.seats)) return new Response('No such seat', { status: 404 })
+  // Accepted: KV has no compare-and-set, so two simultaneous scans of one seat code can
+  // both see it open and the later write wins. Fixing it properly needs Durable Objects.
   if (record.seats[seat]) return new Response('Seat already taken', { status: 409 })
 
   const token = randomId(8)
@@ -84,10 +86,7 @@ async function playResponse(request, env, nonce, seat, token) {
   try {
     record.state = rules.applyMove(record.state, Number(seat), form.get('move') || '')
   } catch (error) {
-    return new Response(playerPage(record, seat, token, rules, error.message), {
-      status: 422,
-      headers: { 'content-type': 'text/html; charset=utf-8' }
-    })
+    return html(playerPage(record, seat, token, rules, error.message), 422)
   }
 
   advancePhase(record, rules)
@@ -100,6 +99,9 @@ async function playResponse(request, env, nonce, seat, token) {
 async function resetResponse(request, env, nonce) {
   const record = await loadByNonce(env.ARCADE, nonce)
   if (!record) return new Response('No such game', { status: 404 })
+  // The screen only shows this code once the game is over; a bystander scanning mid-game
+  // would otherwise wipe a live board and invalidate both players' bookmarks silently.
+  if (record.phase === 'playing') return new Response('Game still in progress', { status: 409 })
 
   Object.keys(record.seats).forEach((seat) => { record.seats[seat] = null })
   record.state = null
@@ -121,8 +123,9 @@ function advancePhase(record, rules) {
   }
 }
 
-function html(body) {
+function html(body, status = 200) {
   return new Response(body, {
+    status,
     headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }
   })
 }

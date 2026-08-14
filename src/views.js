@@ -20,12 +20,13 @@ const grid = (rows) =>
 
 export function seatPicker(record, origin) {
   const seats = Object.keys(record.seats)
-    .map((seat) => {
-      const token = record.seats[seat]
-      return token
-        ? `<li><a href="${origin}/p/${record.nonce}/${seat}/${token}">Resume seat ${escape(seat)}</a></li>`
+    .map((seat) =>
+      // Never link a claimed seat: this picker sits behind the rejoin code printed on the
+      // shared screen, so any link here is handed to every bystander who can see it.
+      record.seats[seat]
+        ? `<li>Seat ${escape(seat)} taken — open your bookmark to resume</li>`
         : `<li><a href="${origin}/j/${record.nonce}/${seat}">Claim seat ${escape(seat)}</a></li>`
-    })
+    )
     .join('')
 
   return page('Pick your seat', `<h1>Pick your seat</h1><ul>${seats}</ul>`)

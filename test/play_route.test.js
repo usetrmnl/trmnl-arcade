@@ -67,6 +67,17 @@ describe('GET /j/:nonce/:seat', () => {
   })
 })
 
+describe('GET /j/:nonce', () => {
+  it('never links a claimed seat', async () => {
+    const kv = memoryKv()
+    const nonce = await lobby(kv)
+    const token = await claim(kv, nonce, 1)
+    const page = await (await call(`/j/${nonce}`, kv)).text()
+
+    expect(page).not.toContain(token)
+  })
+})
+
 describe('POST /p/:nonce/:seat/:token', () => {
   it('applies a legal move', async () => {
     const kv = memoryKv()
@@ -118,12 +129,22 @@ describe('GET /p/:nonce/:seat/:token', () => {
   })
 })
 
+const CHECKMATE = [[1, 'f3'], [2, 'e5'], [1, 'g4'], [2, 'Qh4#']]
+
+const playToCheckmate = async (kv, nonce, tokens) => {
+  for (const [seat, san] of CHECKMATE) await move(kv, nonce, seat, tokens[seat], san)
+}
+
+const seatedGame = async (kv) => {
+  const nonce = await lobby(kv)
+  return { nonce, tokens: { 1: await claim(kv, nonce, 1), 2: await claim(kv, nonce, 2) } }
+}
+
 describe('GET /again/:nonce', () => {
   it('reopens every seat', async () => {
     const kv = memoryKv()
-    const nonce = await lobby(kv)
-    await claim(kv, nonce, 1)
-    await claim(kv, nonce, 2)
+    const { nonce, tokens } = await seatedGame(kv)
+    await playToCheckmate(kv, nonce, tokens)
     await call(`/again/${nonce}`, kv)
 
     expect((await (await call('/s/chess/A1B2C3.json', kv)).json()).seats_open).toEqual([1, 2])
@@ -131,8 +152,8 @@ describe('GET /again/:nonce', () => {
 
   it('keeps the nonce so the printed code still works', async () => {
     const kv = memoryKv()
-    const nonce = await lobby(kv)
-    await claim(kv, nonce, 1)
+    const { nonce, tokens } = await seatedGame(kv)
+    await playToCheckmate(kv, nonce, tokens)
     await call(`/again/${nonce}`, kv)
 
     expect((await (await call('/s/chess/A1B2C3.json', kv)).json()).nonce).toBe(nonce)
@@ -140,13 +161,27 @@ describe('GET /again/:nonce', () => {
 
   it('clears the finished board', async () => {
     const kv = memoryKv()
-    const nonce = await lobby(kv)
-    const token = await claim(kv, nonce, 1)
-    await claim(kv, nonce, 2)
-    await move(kv, nonce, 1, token, 'e4')
+    const { nonce, tokens } = await seatedGame(kv)
+    await playToCheckmate(kv, nonce, tokens)
     await call(`/again/${nonce}`, kv)
 
     expect((await (await call('/s/chess/A1B2C3.json', kv)).json()).board).toBeNull()
+  })
+
+  it('refuses to wipe a game still in progress', async () => {
+    const kv = memoryKv()
+    const { nonce } = await seatedGame(kv)
+
+    expect((await call(`/again/${nonce}`, kv)).status).toBe(409)
+  })
+
+  it('frees a seat abandoned before the game started', async () => {
+    const kv = memoryKv()
+    const nonce = await lobby(kv)
+    await claim(kv, nonce, 1)
+    await call(`/again/${nonce}`, kv)
+
+    expect((await (await call('/s/chess/A1B2C3.json', kv)).json()).seats_open).toEqual([1, 2])
   })
 
   it('404s an unknown nonce', async () => {
