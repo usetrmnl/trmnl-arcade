@@ -16,7 +16,7 @@ where each player has content (in this case, a fleet) that the other player can'
 
 ## How to play games
 
-1. Install a TRMNL Arcade recipe like [Chess](https://trmnl.com/recipes/415050) or [Battlefield](https://trmnl.com/recipes/415057).
+1. Install a TRMNL Arcade recipe like [Chess](https://trmnl.com/recipes/415050) or [Battleship](https://trmnl.com/recipes/415057).
 2. Scan the QR code(s) to start the game. Don't close the tab. ;)
 3. Have fun and stay safe.
 
