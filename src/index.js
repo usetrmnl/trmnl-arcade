@@ -2,10 +2,15 @@ import { GAMES } from './games/index.js'
 import { newRecord, save, loadByKey, loadByNonce, randomId } from './store.js'
 import { seatPicker, playerPage } from './views.js'
 
+const REPO_URL = 'https://github.com/usetrmnl/trmnl-arcade'
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const segments = url.pathname.split('/').filter(Boolean)
+
+    // The arcade has no home page of its own — send visitors to the repo instead.
+    if (segments.length === 0) return Response.redirect(REPO_URL, 302)
 
     if (segments[0] === 's' && segments.length === 3) {
       return stateResponse(request, env, segments[1], segments[2].replace(/\.json$/, ''))
